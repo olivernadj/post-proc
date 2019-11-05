@@ -1,0 +1,83 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a sample server Processing and saving incoming requests"
+  version: "1.0.0"
+  title: "Post process"
+  contact:
+    email: "mr.oliver.nadj@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/v1"
+tags:
+- name: "action"
+  description: "Simple actions from 3d-party providers"
+schemes:
+- "http"
+paths:
+  /action:
+    post:
+      tags:
+      - "action"
+      summary: "Add a new action to the storage for further processing"
+      description: ""
+      operationId: "addAction"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The action object that needs to be added to the storage"
+        required: true
+        schema:
+          $ref: "#/definitions/NewAction"
+        x-exportParamName: "Body"
+      - name: "Source-Type"
+        in: "header"
+        required: true
+        type: "string"
+        enum:
+        - "available"
+        - "pending"
+        - "sold"
+        x-exportParamName: "SourceType"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - petstore_auth:
+        - "write:actions"
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:8080/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:actions: "modify items in your account"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  NewAction:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+      state:
+        type: "string"
+        description: "Status of the item"
+        enum:
+        - "new"
+        - "processed"
+        - "deleted"
+    example:
+      action: "action"
+      state: "new"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
