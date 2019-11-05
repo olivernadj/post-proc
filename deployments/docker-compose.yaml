@@ -1,11 +1,14 @@
 version: '3'
 services:
   db:
+    container_name: post_proc_db
     image: percona
-    restart: always
+    volumes:
+      - ../scripts:/scripts
     environment:
       MYSQL_ROOT_PASSWORD: example
   adminer:
+    container_name: post_proc_db_admin
     image: adminer
     restart: always
     ports:
@@ -13,10 +16,11 @@ services:
     links:
       - db
   post-proc:
+    container_name: post_proc_restapi
     build: ../build
     volumes:
       - ../.:/go/src/github.com/olivernadj/post-proc
-    working_dir: /go/src/github.com/olivernadj/post-proc/cmd/post-proc
+    working_dir: /go/src/github.com/olivernadj/post-proc/cmd/restapi
     ports:
       - 8080:8080
     command: "go run main.go"

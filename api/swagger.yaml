@@ -12,52 +12,45 @@ info:
 host: "localhost:8080"
 basePath: "/v1"
 tags:
-- name: "action"
-  description: "Simple actions from 3d-party providers"
+  - name: "action"
+    description: "Simple actions from 3d-party providers"
 schemes:
-- "http"
+  - "http"
 paths:
   /action:
     post:
       tags:
-      - "action"
+        - "action"
       summary: "Add a new action to the storage for further processing"
       description: ""
       operationId: "addAction"
       consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "The action object that needs to be added to the storage"
-        required: true
-        schema:
-          $ref: "#/definitions/NewAction"
-        x-exportParamName: "Body"
-      - name: "Source-Type"
-        in: "header"
-        required: true
-        type: "string"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-        x-exportParamName: "SourceType"
+        - in: "body"
+          name: "body"
+          description: "The action object that needs to be added to the storage"
+          required: true
+          schema:
+            $ref: "#/definitions/NewAction"
+          x-exportParamName: "Body"
+        - name: "Source-Type"
+          in: "header"
+          required: true
+          type: "string"
+          enum:
+            - "client"
+            - "server"
+            - "payment"
+          x-exportParamName: "SourceType"
       responses:
+        201:
+          description: "Created"
         405:
           description: "Invalid input"
       security:
-      - petstore_auth:
-        - "write:actions"
+        - api_key: []
 securityDefinitions:
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "http://localhost:8080/oauth/dialog"
-    flow: "implicit"
-    scopes:
-      write:actions: "modify items in your account"
   api_key:
     type: "apiKey"
     name: "api_key"
@@ -72,9 +65,9 @@ definitions:
         type: "string"
         description: "Status of the item"
         enum:
-        - "new"
-        - "processed"
-        - "deleted"
+          - "new"
+          - "processed"
+          - "deleted"
     example:
       action: "action"
       state: "new"

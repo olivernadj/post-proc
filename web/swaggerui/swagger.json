@@ -35,9 +35,6 @@
         "consumes": [
           "application/json"
         ],
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "body",
@@ -46,44 +43,39 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/NewAction"
-            }
+            },
+            "x-exportParamName": "Body"
           },
           {
-            "in": "header",
             "name": "Source-Type",
+            "in": "header",
             "required": true,
             "type": "string",
             "enum": [
-              "available",
-              "pending",
-              "sold"
-            ]
+              "client",
+              "server",
+              "payment"
+            ],
+            "x-exportParamName": "SourceType"
           }
         ],
         "responses": {
+          "201": {
+            "description": "Created"
+          },
           "405": {
             "description": "Invalid input"
           }
         },
         "security": [
           {
-            "petstore_auth": [
-              "write:actions"
-            ]
+            "api_key": []
           }
         ]
       }
     }
   },
   "securityDefinitions": {
-    "petstore_auth": {
-      "type": "oauth2",
-      "authorizationUrl": "http://localhost:8080/oauth/dialog",
-      "flow": "implicit",
-      "scopes": {
-        "write:actions": "modify items in your account"
-      }
-    },
     "api_key": {
       "type": "apiKey",
       "name": "api_key",
@@ -106,6 +98,10 @@
             "deleted"
           ]
         }
+      },
+      "example": {
+        "action": "action",
+        "state": "new"
       }
     }
   },

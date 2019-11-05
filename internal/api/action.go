@@ -11,10 +11,38 @@
 package swagger
 
 import (
+	"encoding/json"
+	"github.com/olivernadj/post-proc/internal/sqlconn"
+	"github.com/olivernadj/post-proc/pkg/model"
+	"log"
 	"net/http"
 )
 
 func AddAction(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	var req model.NewAction
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("cannot parse request: %v\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	st := r.Header.Get("Source-Type")
+
+	db, err := sqlconn.GetConnection()
+	if err != nil {
+		log.Printf(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	insert, err := db.Query("INSERT INTO `action` (`action`, `state`, `source_type`) VALUES (?, ?, ?)", req.Action, req.State, st)
+	if err != nil {
+		log.Printf(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer insert.Close()
+
+	w.WriteHeader(http.StatusCreated)
 }
