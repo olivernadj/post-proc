@@ -11,13 +11,13 @@
 package main
 
 import (
-	sw "github.com/olivernadj/post-proc/goapi/go"
+	"github.com/olivernadj/post-proc/internal/swagger"
 	"log"
 	"net/http"
 )
 
 func main() {
-	log.Printf("Server started")
-	router := sw.NewRouter()
+	log.Printf("Server started at :8080")
+	router := swagger.NewRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

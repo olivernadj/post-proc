@@ -12,11 +12,11 @@ services:
       - 8081:8080
     links:
       - db
-  postapi:
-    build: ./goapi
+  post-proc:
+    build: ../build
     volumes:
-      - ./goapi:/go/src/goapi
-    working_dir: /go/src/goapi
+      - ../.:/go/src/github.com/olivernadj/post-proc
+    working_dir: /go/src/github.com/olivernadj/post-proc/cmd/post-proc
     ports:
       - 8080:8080
     command: "go run main.go"

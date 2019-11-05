@@ -11,6 +11,7 @@
 package swagger
 
 import (
+	"github.com/olivernadj/post-proc/internal/api"
 	"net/http"
 	"strings"
 
@@ -28,7 +29,7 @@ type Routes []Route
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.NotFoundHandler = http.FileServer(http.Dir("./swaggerui/"))
+	router.NotFoundHandler = http.FileServer(http.Dir("../../web/swaggerui/"))
 	for _, route := range routes {
 		var handler http.Handler
 		handler = route.HandlerFunc
@@ -60,6 +61,6 @@ var routes = Routes{
 		"AddAction",
 		strings.ToUpper("Post"),
 		"/v1/action",
-		AddAction,
+		swagger.AddAction,
 	},
 }
