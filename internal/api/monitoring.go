@@ -1,7 +1,6 @@
-package utils
+package api
 
 import (
-	_ "github.com/olivernadj/post-proc/internal/api"
 	"github.com/prometheus/client_golang/prometheus"
 	"log"
 	"net/http"
@@ -28,7 +27,7 @@ func BuildSummaryVec(metricName string, metricHelp string, service string) *prom
 
 // WithMonitoring optionally adds a middleware that stores request duration and response size into the supplied
 // summaryVec
-func WithMonitoring(next http.Handler, route api.Route, summary *prometheus.SummaryVec) http.Handler {
+func WithMonitoring(next http.Handler, route Route, summary *prometheus.SummaryVec) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		start := time.Now()
 		lrw := NewMonitoringResponseWriter(rw)

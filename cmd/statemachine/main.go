@@ -1,21 +1,30 @@
 package main
 
 import (
-	"github.com/olivernadj/post-proc/internal/sqlconn"
-	"github.com/olivernadj/post-proc/pkg/model"
+	"github.com/gorilla/mux"
+	"github.com/kelseyhightower/envconfig"
+	"github.com/olivernadj/post-proc/internal/api"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
 )
 
-//SELECT *
-//FROM `action`
-//WHERE created < NOW() - INTERVAL 1 MINUTE
-//LIMIT 50
 
+type Specification struct {
+	TTProcess   int `envconfig:"TT_PROCESS" required:"false" default:"10"`
+	TTDelete	int `envconfig:"TT_DELETE" required:"false" default:"10"`
+}
 
 func main() {
+	var s Specification
+	err := envconfig.Process("", &s)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	//check for action timeouts in every 5 seconds
 	ticker := time.NewTicker(5 * time.Second)
 	// trap Ctrl+C and call cancel
@@ -26,93 +35,28 @@ func main() {
 		log.Printf("signal stop")
 		signal.Stop(c)
 	}()
-
-	for {
-		select {
-		case <- ticker.C:
-			// do stuff
-			handleProcess(1)
-			handleDelete(1)
-		case <-c:
-			log.Printf("gracefully stop statemachinge")
-			ticker.Stop()
-			return
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				//handle events
+				api.HandleProcess(s.TTDelete)
+				api.HandleDelete(s.TTProcess)
+			case <-c:
+				log.Printf("gracefully stop statemachinge")
+				ticker.Stop()
+				return
+			}
 		}
-	}
+	}()
+
+	// http for metrics only
+	r := mux.NewRouter().StrictSlash(true)
+	r.HandleFunc("/metrics", metricsHandler)
+	log.Fatal(http.ListenAndServe(":8082", r))
 }
 
-func handleProcess(interval int) {
-	db, err := sqlconn.GetConnection()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer db.Close()
-	results, err := db.Query("" +
-		"SELECT `id`, `state`, `processed` " +
-		"	FROM `action` " +
-		"	WHERE `state` = 'new' AND created < NOW() - INTERVAL ? MINUTE", interval)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	for results.Next() {
-		var a model.Action
-		//var p string
-		err = results.Scan(&a.Id, &a.State, &a.Processed)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		aws := a.NewWithState()
-		err = aws.FSM.Event("process")
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		err = aws.Save()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	defer results.Close()
-}
-
-func handleDelete(interval int) {
-	db, err := sqlconn.GetConnection()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer db.Close()
-	results, err := db.Query("" +
-		"SELECT `id`, `state`, `processed` " +
-		"	FROM `action` " +
-		"	WHERE `state` = 'processed' AND processed < NOW() - INTERVAL ? MINUTE", interval)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	for results.Next() {
-		var a model.Action
-		//var p string
-		err = results.Scan(&a.Id, &a.State, &a.Processed)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		aws := a.NewWithState()
-		err = aws.FSM.Event("delete")
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		err = aws.Save()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	defer results.Close()
+func metricsHandler (w http.ResponseWriter, r *http.Request) {
+	p := promhttp.Handler()
+	p.ServeHTTP(w, r)
 }

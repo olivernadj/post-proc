@@ -3,8 +3,9 @@ package sqlconn
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"os"
 )
 
 func GetConnection()(*sql.DB, error) {
-	return sql.Open("mysql", "root:example@tcp(db:3306)/postproc?parseTime=true")
+	return sql.Open("mysql", os.Getenv("DATA_SOURCE_NAME"))
 }
