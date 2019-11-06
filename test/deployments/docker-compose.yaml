@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db_test:
+    container_name: post_proc_db_test
+    image: percona
+    volumes:
+      - ../scripts:/scripts
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+  restapi_test:
+    container_name: post_proc_restapi_test
+    build: ../../build/restapi
+    volumes:
+      - ../..:/go/src/github.com/olivernadj/post-proc
+    working_dir: /go/src/github.com/olivernadj/post-proc/cmd/restapi
+    environment:
+      DATA_SOURCE_NAME: "root:example@tcp(db_test:3306)/postproc_test?parseTime=true"
+    ports:
+      - 8180:8080
+    command: "go test -v"
+    links:
+      - db_test
+  statemachine_test:
+    container_name: post_proc_statemachine_test
+    build: ../../build/statemachine
+    volumes:
+      - ../..:/go/src/github.com/olivernadj/post-proc
+    working_dir: /go/src/github.com/olivernadj/post-proc/cmd/statemachine
+    environment:
+      DATA_SOURCE_NAME: "root:example@tcp(db_test:3306)/postproc_test?parseTime=true"
+    ports:
+      - 8182:8082
+    command: "go test -v"
+    links:
+      - db_test

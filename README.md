@@ -7,8 +7,11 @@ Make sure you have `docker` and `docker-compose` installed.
 `$ make createdb`
 
 - Swagger gui http://localhost:8080
+- Grafana http://localhost:3000 user:admin, pass:5ecret
 - MYSQL admin http://localhost:8081 user:root, pass:example
 
+## test
+`$ make test`
 
 ## Todo
 The main goal of this test task is to develop the application for processing the incoming requests from the 3d-party providers.

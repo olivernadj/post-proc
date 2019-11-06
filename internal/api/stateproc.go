@@ -45,7 +45,7 @@ func handleProcess(interval int) {
 	results, err := db.Query("" +
 		"SELECT `id`, `state`, `processed` " +
 		"	FROM `action` " +
-		"	WHERE `state` = 'new' AND created < NOW() - INTERVAL ? MINUTE", interval)
+		"	WHERE `state` = 'new' AND created <= NOW() - INTERVAL ? MINUTE", interval)
 	if err != nil {
 		log.Println(err)
 		return
@@ -84,7 +84,7 @@ func handleDelete(interval int) {
 	results, err := db.Query("" +
 		"SELECT `id`, `state`, `processed` " +
 		"	FROM `action` " +
-		"	WHERE `state` = 'processed' AND processed < NOW() - INTERVAL ? MINUTE", interval)
+		"	WHERE `state` = 'processed' AND processed <= NOW() - INTERVAL ? MINUTE", interval)
 	if err != nil {
 		log.Println(err)
 		return

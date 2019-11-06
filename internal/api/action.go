@@ -24,8 +24,13 @@ func AddAction(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
 	req.SourceType = r.Header.Get("Source-Type")
+
+	if req.Action == "" || req.State == "" || req.SourceType == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	err := req.Insert()
 	if err != nil {
 		log.Printf(err.Error())
