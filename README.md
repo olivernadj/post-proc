@@ -3,7 +3,11 @@ This is a sample server processing and saving incoming requests
 
 
 ## run
-```$ docker-compose up -d --build```
+Make sure you have `docker` and `docker-compose` installed.
+`$ make createdb`
+
+- Swagger gui http://localhost:8080
+- MYSQL admin http://localhost:8081 user:root, pass:example
 
 
 ## Todo
