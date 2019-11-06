@@ -15,14 +15,23 @@ services:
       - 8081:8080
     links:
       - db
-  post-proc:
+  restapi:
     container_name: post_proc_restapi
-    build: ../build
+    build: ../build/restapi
     volumes:
       - ../.:/go/src/github.com/olivernadj/post-proc
     working_dir: /go/src/github.com/olivernadj/post-proc/cmd/restapi
     ports:
       - 8080:8080
+    command: "go run main.go"
+    links:
+      - db
+  statemachine:
+    container_name: post_proc_statemachine
+    build: ../build/statemachine
+    volumes:
+      - ../.:/go/src/github.com/olivernadj/post-proc
+    working_dir: /go/src/github.com/olivernadj/post-proc/cmd/statemachine
     command: "go run main.go"
     links:
       - db

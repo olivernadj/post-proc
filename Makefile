@@ -11,8 +11,8 @@ restart: | stop start
 run:
 	cd deployments && docker-compose up --build
 
-createdb:
+createdb: | restart
 	docker exec -t post_proc_db sh -c /scripts/create.sql.sh
 
-clean:
+clean: | stop
 	cd deployments && docker-compose rm -f

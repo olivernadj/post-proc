@@ -10,11 +10,21 @@ CREATE TABLE \`action\` (
   \`action\` varchar(31) NOT NULL,
   \`source_type\` varchar(31) NOT NULL,
   \`state\` varchar(31) NOT NULL,
-  \`processed\` timestamp NULL DEFAULT NULL,
+  \`processed\` timestamp NOT NULL DEFAULT 0,
   \`created\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (\`id\`)
+  PRIMARY KEY (\`id\`),
+  KEY \`created\` (\`created\`),
+  KEY \`processed\` (\`processed\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 EOF
+
+
+while ! mysqladmin ping -h localhost --silent; do
+    echo "Waiting for database connection..."
+    sleep 2
+done
+
+sleep 5
 
 mysql -u root --password=example -e "DROP DATABASE IF EXISTS postproc;"
 mysql -u root --password=example -e "CREATE DATABASE postproc COLLATE utf8_general_ci;"

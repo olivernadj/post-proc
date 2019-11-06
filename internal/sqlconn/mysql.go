@@ -6,5 +6,5 @@ import (
 )
 
 func GetConnection()(*sql.DB, error) {
-	return sql.Open("mysql", "root:example@tcp(db:3306)/post-proc")
+	return sql.Open("mysql", "root:example@tcp(db:3306)/postproc?parseTime=true")
 }
