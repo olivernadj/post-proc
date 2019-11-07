@@ -1,4 +1,4 @@
-.PHONY: start stop run createdb clean test
+.PHONY: start stop run createdb clean test fakeload
 
 start:
 	cd deployments && docker-compose up -d --build
@@ -28,3 +28,5 @@ test:
 	docker-compose stop &&\
 	docker-compose rm -f
 
+fakeload:
+	scripts/fakeload.sh

@@ -7,11 +7,14 @@ Make sure you have `docker` and `docker-compose` installed.
 
 `$ make createdb`  - this will (re)create database and start services.
  
-`$ make stop` will kill the pods.
+`$ make fakeload` - generates fake load
 
 - Swagger gui http://localhost:8080
 - Grafana http://localhost:3000 user:admin, pass:5ecret
 - MYSQL admin http://localhost:8081 user:root, pass:example
+ 
+`$ make stop` will kill the pods.
+
 
 ## test
 `$ make test` - this will recreate containers, run the test and clean them.
